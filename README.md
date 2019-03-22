@@ -23,8 +23,8 @@ Notre système collecte toutes les informations des transactions de tous les mag
 Par contre les fichiers de référentiels produits sont reçu par magasin.
 Les règles de nommage de ces fichiers sont les suivantes:
 
-  - les transactions : `transactions_YYYYMMDD.data`
-  - les référentiels : `reference_prod-ID_MAGASIN_YYYYMMDD.data` où ID_MAGASIN est un UUID identifiant le magasin.
+- les transactions : `transactions_YYYYMMDD.data`
+- les référentiels : `reference_prod-ID_MAGASIN_YYYYMMDD.data` où ID_MAGASIN est un UUID identifiant le magasin.
 
 Vous trouverez dans le répertoire /data/ des fichiers exemples qui vous permettront d'avoir une idée concrète de leur contenu.
 
