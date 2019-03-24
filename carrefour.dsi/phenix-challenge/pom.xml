@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--The identifier of the parent POM-->
+    <parent>
+        <groupId>fr.carrefour</groupId>
+        <artifactId>carrefour-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>phenix-challenge</artifactId>
+    <name>Phenix Challenge</name>
+    <packaging>jar</packaging>
+
+    <scm>
+        <developerConnection>scm:git:ssh://git@github.com:Carrefour-Group/phenix-challenge.git</developerConnection>
+    </scm>
+
+    <dependencies>
+
+        <!-- csv parser -->
+        <dependency>
+            <groupId>com.univocity</groupId>
+            <artifactId>univocity-parsers</artifactId>
+            <version>2.8.1</version>
+        </dependency>
+
+        <!-- logging -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+
+        <!-- unit tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--<plugin>-->
+                <!--<groupId>org.springframework.boot</groupId>-->
+                <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<goals>-->
+                            <!--<goal>repackage</goal> &lt;!&ndash; get a fat jar via 'mvn package spring-boot:repackage' &ndash;&gt;-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<configuration>-->
+                    <!--<mainClass>fr.carrefour.phenix.challenge.Application</mainClass>-->
+                    <!--&lt;!&ndash;<layout>ZIP</layout>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<executable>true</executable>&ndash;&gt;-->
+                <!--</configuration>-->
+            <!--</plugin>-->
+        </plugins>
+    </build>
+
+</project>

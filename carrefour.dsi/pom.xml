@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>fr.carrefour</groupId>
+    <artifactId>carrefour-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Carrefour</name>
+    <description>Carrefour Parent</description>
+    <url>http://carrefour.fr</url>
+
+    <scm>
+        <developerConnection>scm:git:ssh://git@github.com:Carrefour-Group/phenix-challenge.git</developerConnection>
+    </scm>
+
+    <modules>
+        <module>phenix-challenge</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>1.8</java.version>
+
+        <!-- versions for our libraries -->
+        <!--<spring.version>5.1.4.RELEASE</spring.version>-->
+        <!--<spring-boot.version>2.1.2.RELEASE</spring-boot.version>-->
+        <!--<spring-kafka.version>2.2.3.RELEASE</spring-kafka.version>-->
+        <!--<spring-data-elasticsearch.version>3.1.5.RELEASE</spring-data-elasticsearch.version>-->
+        <!--<jackson.version>2.9.8</jackson.version>-->
+
+        <!-- versions for our test libraries -->
+        <log4j.version>2.11.2</log4j.version>
+        <junit.version>4.12</junit.version>
+        <mockito.version>1.10.19</mockito.version>
+        <univocity-parsers.version>2.8.1</univocity-parsers.version>
+
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- libraries -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+
+            <!--<dependency>-->
+                <!--<groupId>com.univocity</groupId>-->
+                <!--<artifactId>univocity-parsers</artifactId>-->
+                <!--<version>${univocity-parsers.version}</version>-->
+            <!--</dependency>-->
+
+            <!--<dependency>-->
+                <!--<groupId>org.springframework</groupId>-->
+                <!--<artifactId>spring-core</artifactId>-->
+                <!--<version>${spring.version}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.springframework.boot</groupId>-->
+                <!--<artifactId>spring-boot-dependencies</artifactId>-->
+                <!--<version>${spring-boot.version}</version>-->
+                <!--<type>pom</type>-->
+                <!--<scope>import</scope>-->
+            <!--</dependency>-->
+
+            <!-- test libraries -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies/> <!-- not a good idea here unless is a *really* common dependency for all child modules -->
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!--<plugin>-->
+                    <!--<groupId>org.springframework.boot</groupId>-->
+                    <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+                    <!--<version>${spring-boot.version}</version>-->
+                <!--</plugin>-->
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>
