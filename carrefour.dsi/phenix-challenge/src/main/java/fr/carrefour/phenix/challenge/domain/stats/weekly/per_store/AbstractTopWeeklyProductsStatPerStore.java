@@ -33,7 +33,6 @@ public abstract class AbstractTopWeeklyProductsStatPerStore implements ProductsS
 
         for (int i = 0; i <= 6; ++i) {
             LocalDate dt = date.minusDays(i);
-
             ProductsJournal journal = repository.getJournal(dt);
 
             ProductsGroup products = journal.getStoreProducts(storeId);

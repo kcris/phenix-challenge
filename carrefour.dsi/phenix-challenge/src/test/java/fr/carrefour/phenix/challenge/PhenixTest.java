@@ -2,9 +2,9 @@ package fr.carrefour.phenix.challenge;
 
 import fr.carrefour.phenix.challenge.domain.products.Product;
 import fr.carrefour.phenix.challenge.domain.products.ProductsGroup;
-import fr.carrefour.phenix.challenge.domain.products.aggregators.ProductAggregatorByUnitsSold;
-import fr.carrefour.phenix.challenge.domain.products.comparators.ProductsComparatorByUnitsSold;
-import fr.carrefour.phenix.challenge.domain.products.comparators.ProductsComparatorByValueSold;
+import fr.carrefour.phenix.challenge.domain.products.aggregators.ProductAggregatorSumSales;
+import fr.carrefour.phenix.challenge.domain.products.comparators.ProductsComparatorBySoldVolume;
+import fr.carrefour.phenix.challenge.domain.products.comparators.ProductsComparatorBySoldValue;
 import org.junit.*;
 
 import java.util.HashMap;
@@ -47,7 +47,7 @@ public class PhenixTest {
 
         ProductsGroup p1 = new ProductsGroup(products1);
 
-        Map<Integer, Product> result = p1.top(2, new ProductsComparatorByUnitsSold())
+        Map<Integer, Product> result = p1.top(2, new ProductsComparatorBySoldVolume())
                                          .getProducts();
 
         assertTrue(result.size() == 2);
@@ -63,7 +63,7 @@ public class PhenixTest {
 
         ProductsGroup p2 = new ProductsGroup(products2);
 
-        Map<Integer, Product> result = p2.top(2, new ProductsComparatorByValueSold())
+        Map<Integer, Product> result = p2.top(2, new ProductsComparatorBySoldValue())
                                          .getProducts();
 
         assertTrue(result.size() == 2);
@@ -79,7 +79,7 @@ public class PhenixTest {
         ProductsGroup p1 = new ProductsGroup(products1);
         ProductsGroup p2 = new ProductsGroup(products2);
 
-        Map<Integer, Product> result = p1.merge(p2, new ProductAggregatorByUnitsSold())
+        Map<Integer, Product> result = p1.merge(p2, new ProductAggregatorSumSales())
                                          .getProducts();
 
         assertTrue(result.size() == 6);

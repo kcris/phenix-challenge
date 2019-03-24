@@ -56,10 +56,14 @@ public class ProductsJournalBuilderCsv implements ProductsJournalBuilder {
      * read transactions csv file which contains all transactions for all stores, at the given date
      *
      * @param csvFilename the name of the csv file to be loaded
+     *
+     * updates the unitsSold for each product (valueSold is missing at the moment, will be later loaded)
      */
     private void loadTransactions(ProductsJournal journal, String csvFilename)  {
 
         String csvPath = String.format("%s/%s", dataFolder, csvFilename);
+
+        LOGGER.debug("Loading transactions from " + csvPath);
 
         try {
             final Map<UUID, ProductsGroup> allProducts = journal.getAllProducts();
@@ -72,17 +76,23 @@ public class ProductsJournalBuilderCsv implements ProductsJournalBuilder {
 
                 UUID storeId = UUID.fromString(fields[2]);
                 int productId = Integer.valueOf(fields[3]);
-                int quantity = Integer.valueOf(fields[4]);
+                int unitsSold = Integer.valueOf(fields[4]);
 
                 ProductsGroup storeProducts = allProducts.get(storeId);
 
                 if (storeProducts == null) {
                     ProductsGroup newStoreProducts = new ProductsGroup();
-                    newStoreProducts.addProduct(new Product(productId, quantity));
+                    newStoreProducts.addProduct(new Product(productId, unitsSold)); //add new product
 
-                    allProducts.put(storeId, newStoreProducts); //add new store/product
+                    allProducts.put(storeId, newStoreProducts); //add new store
                 } else {
-                    storeProducts.mergeProductQuantity(productId, quantity); //update product's units sold
+                    Product product = storeProducts.getProduct(productId);
+                    if (product != null) {
+                        product.setUnitsSold(product.getUnitsSold() + unitsSold); //update unitsSold information
+                    }
+                    else {
+                        storeProducts.addProduct(new Product(productId, unitsSold)); //add new product
+                    }
                 }
             }
         }
@@ -95,10 +105,14 @@ public class ProductsJournalBuilderCsv implements ProductsJournalBuilder {
      * read prices csv file which contains the prices for all products used by a specific store, at the given date
      *
      * @param csvFilename the name of the csv file to be loaded
+     *
+     * updates the valueSold for each product (unitsSold has already been loaded)
      */
     private void loadPrices(ProductsJournal journal, String csvFilename) {
 
         String csvPath = String.format("%s/%s", dataFolder, csvFilename);
+
+        LOGGER.debug("Loading prices from " + csvPath);
 
         try{
             final UUID storeId = UUID.fromString(csvFilename.substring(15, 15+36));
@@ -107,11 +121,11 @@ public class ProductsJournalBuilderCsv implements ProductsJournalBuilder {
             assert allProducts != null;
 
             final ProductsGroup storeProducts = allProducts.get(storeId);
+            //assert storeProducts != null;
             if (storeProducts == null) {
-                LOGGER.debug("Ref file store not found in transactions, skipping price update");
+                LOGGER.debug("Ref file store not found in transactions, skipping valueSold update");
                 return;
             }
-            //assert storeProducts != null;
 
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(csvPath), "UTF-8"));
             String line = null;
@@ -122,12 +136,11 @@ public class ProductsJournalBuilderCsv implements ProductsJournalBuilder {
                 float unitPrice = Float.valueOf(fields[1]);
 
                 Product prod = storeProducts.getProduct(productId);
-                //assert prod != null;
                 if (prod != null) {
-                    prod.setUnitPrice(unitPrice); //just add unit price information
+                    prod.setValueSold(prod.getUnitsSold() * unitPrice); //add valueSold information
                 }
                 else {
-                    LOGGER.debug("Ref file product not found in transactions, skipping price update");
+                    LOGGER.debug("Ref file product not found in transactions, skipping valueSold update");
                 }
             }
         }

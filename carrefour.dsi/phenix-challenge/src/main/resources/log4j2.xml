@@ -5,14 +5,15 @@
             %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${hostName} --- [%15.15t] %-40.40c{1.} : %m%n%ex
         </Property>
     </Properties>
+
     <Appenders>
         <Console name="ConsoleAppender" target="SYSTEM_OUT" follow="true">
             <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
 
         <!-- Rolling File Appender -->
-        <RollingFile name="FileAppender" fileName="logs/log4j2-demo.log"
-                     filePattern="logs/log4j2-demo-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="FileAppender" fileName="logs/phenix-challenge.log"
+                     filePattern="logs/phenix-challenge-%d{yyyy-MM-dd}-%i.log">
             <PatternLayout>
                 <Pattern>${LOG_PATTERN}</Pattern>
             </PatternLayout>
@@ -22,8 +23,8 @@
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
     </Appenders>
-    <Loggers>
 
+    <Loggers>
         <Root level="info">
             <AppenderRef ref="ConsoleAppender"/>
             <!--<AppenderRef ref="FileAppender"/>-->

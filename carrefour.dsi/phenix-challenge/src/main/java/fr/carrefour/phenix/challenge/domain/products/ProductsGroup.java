@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * contains information about a list of products, grouped by the product id
  *
- * Contains the prices and quantities for all products available in a given store, at a specified date.
+ * Contains the sales information for all products available in a given store, at a specified date.
  *
  * For daily product information, see {@link Product}
  */
@@ -33,17 +33,6 @@ public class ProductsGroup {
     public void addProduct(Product product) {
         assert products.get(product.getProductId()) == null;
         products.put(product.getProductId(), product);
-    }
-
-    public void mergeProductQuantity(int productId, int deltaUnitsSold) {
-        Product product = products.get(productId);
-        if (product != null) {
-            int quantity = product.getUnitsSold() + deltaUnitsSold;
-            product.setUnitsSold(quantity);
-        }
-        else {
-            products.put(productId, new Product(productId, deltaUnitsSold));
-        }
     }
 
     public Product getProduct(int productId) {

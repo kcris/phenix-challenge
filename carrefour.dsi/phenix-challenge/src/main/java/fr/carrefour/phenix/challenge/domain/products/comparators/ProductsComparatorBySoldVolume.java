@@ -5,9 +5,9 @@ import fr.carrefour.phenix.challenge.domain.products.Product;
 import java.util.Comparator;
 
 /**
- * compares products by sales = number of units sold (ventes)
+ * compares products by sold volume = number of units sold (ventes)
  */
-public class ProductsComparatorByUnitsSold implements Comparator<Product> {
+public class ProductsComparatorBySoldVolume implements Comparator<Product> {
 
     @Override
     public int compare(Product p1, Product p2) {

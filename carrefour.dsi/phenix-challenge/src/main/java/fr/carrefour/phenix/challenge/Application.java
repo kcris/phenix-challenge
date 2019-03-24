@@ -80,12 +80,14 @@ class Application
 				repository.addJournal(dt, dailyProducts); //all products for all stores (at that date)
 			}
 		};
+		LOGGER.info("Loading journals");
 		Thread tA1 = new Thread(rA1);
 		Thread tA2 = new Thread(rA2);
 		tA1.start();
 		tA2.start();
 		tA1.join();
 		tA2.join();
+		LOGGER.info("Loading journals done");
 
 		//
 		// B. tasks for computing the output statistics
@@ -146,12 +148,14 @@ class Application
 				statsSaver.saveProducts(results, CSV("top_100_ca", "GLOBAL", date, "-J7"));
 			}
 		};
+		LOGGER.info("Creating statistics");
 		Thread tB1 = new Thread(rB1);
 		Thread tB2 = new Thread(rB2);
 		tB1.start();
 		tB2.start();
 		tB1.join();
 		tB2.join();
+		LOGGER.info("Creating statistics done");
 
 		long endTime = System.nanoTime();
 		LOGGER.info("Total execution time: " + (endTime-startTime)/1000000 + " millis");
