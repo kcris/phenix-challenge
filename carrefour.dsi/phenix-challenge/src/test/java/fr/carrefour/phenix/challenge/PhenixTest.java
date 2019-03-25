@@ -75,7 +75,7 @@ public class PhenixTest {
     }
 
     @Test
-    public void testAggregatedSales() {
+    public void testAggregatedSalesVolume() {
         ProductsGroup p1 = new ProductsGroup(products1);
         ProductsGroup p2 = new ProductsGroup(products2);
 
@@ -89,5 +89,22 @@ public class PhenixTest {
         assertTrue(result.get(4).getUnitsSold() == 100);
         assertTrue(result.get(30).getUnitsSold() == 15);
         assertTrue(result.get(40).getUnitsSold() == 25);
+    }
+
+    @Test
+    public void testAggregatedSalesValue() {
+        ProductsGroup p1 = new ProductsGroup(products1);
+        ProductsGroup p2 = new ProductsGroup(products2);
+
+        Map<Integer, Product> result = p1.merge(p2, new ProductAggregatorSumSales())
+                .getProducts();
+
+        assertTrue(result.size() == 6);
+        assertTrue(result.get(1).getValueSold() == 15); //merged
+        assertTrue(result.get(2).getValueSold() == 18); //merged
+        assertTrue(result.get(3).getValueSold() == 100);
+        assertTrue(result.get(4).getValueSold() == 50);
+        assertTrue(result.get(30).getValueSold() == 1);
+        assertTrue(result.get(40).getValueSold() == 2);
     }
 }

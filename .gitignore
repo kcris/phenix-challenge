@@ -1,6 +1,7 @@
 .idea
 *.iml
 
+**/data/input
 **/data/output
 **/logs
 **/target
