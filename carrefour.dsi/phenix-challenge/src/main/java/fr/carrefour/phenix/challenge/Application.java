@@ -113,7 +113,7 @@ class Application
 				for(UUID storeId : repository.getJournal(date).getStores()) {
 					ProductsStat stat = new TopWeeklyProductsBySalesVolumePerStore(storeId, date, topLimit, repository);  //for each store
 					ProductsGroup results = stat.getStatistics();
-					statsSaver.saveProducts(results, CSV("top_100_ventes", "GLOBAL", date, "-J7"));
+					statsSaver.saveProducts(results, CSV("top_100_ventes", storeId, date, "-J7"));
 				}
 
 				ProductsStat stat = new TopWeeklyProductsBySalesVolumeGlobally(date, topLimit, repository);
