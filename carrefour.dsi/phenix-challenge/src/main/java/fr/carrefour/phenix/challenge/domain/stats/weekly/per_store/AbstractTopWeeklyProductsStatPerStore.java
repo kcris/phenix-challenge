@@ -2,8 +2,7 @@ package fr.carrefour.phenix.challenge.domain.stats.weekly.per_store;
 
 import fr.carrefour.phenix.challenge.domain.products.Product;
 import fr.carrefour.phenix.challenge.domain.products.ProductsGroup;
-import fr.carrefour.phenix.challenge.domain.products.ProductsJournal;
-import fr.carrefour.phenix.challenge.domain.products.ProductsJournalsRepository;
+import fr.carrefour.phenix.challenge.domain.products.ProductsSalesRepository;
 import fr.carrefour.phenix.challenge.domain.products.aggregators.Aggregator;
 import fr.carrefour.phenix.challenge.domain.stats.ProductsStat;
 
@@ -16,9 +15,9 @@ public abstract class AbstractTopWeeklyProductsStatPerStore implements ProductsS
     private UUID storeId;
     private LocalDate date;
     private int limit;
-    private ProductsJournalsRepository repository;
+    private ProductsSalesRepository repository;
 
-    public AbstractTopWeeklyProductsStatPerStore(UUID storeId, LocalDate date, int limit, ProductsJournalsRepository repository) {
+    public AbstractTopWeeklyProductsStatPerStore(UUID storeId, LocalDate date, int limit, ProductsSalesRepository repository) {
         this.storeId = storeId;
         this.date = date;
         this.limit = limit;
@@ -33,9 +32,8 @@ public abstract class AbstractTopWeeklyProductsStatPerStore implements ProductsS
 
         for (int i = 0; i <= 6; ++i) {
             LocalDate dt = date.minusDays(i);
-            ProductsJournal journal = repository.getJournal(dt);
 
-            ProductsGroup products = journal.getStoreProducts(storeId);
+            ProductsGroup products = repository.getProducts(storeId, dt);
             if (mergedProducts == null)
                 mergedProducts = products;
             else

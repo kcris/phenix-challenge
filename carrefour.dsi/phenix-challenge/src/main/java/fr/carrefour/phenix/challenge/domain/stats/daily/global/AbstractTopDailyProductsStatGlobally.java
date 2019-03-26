@@ -2,23 +2,21 @@ package fr.carrefour.phenix.challenge.domain.stats.daily.global;
 
 import fr.carrefour.phenix.challenge.domain.products.Product;
 import fr.carrefour.phenix.challenge.domain.products.ProductsGroup;
-import fr.carrefour.phenix.challenge.domain.products.ProductsJournal;
-import fr.carrefour.phenix.challenge.domain.products.ProductsJournalsRepository;
+import fr.carrefour.phenix.challenge.domain.products.ProductsSalesRepository;
 import fr.carrefour.phenix.challenge.domain.products.aggregators.Aggregator;
 import fr.carrefour.phenix.challenge.domain.stats.ProductsStat;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.Map;
-import java.util.UUID;
 
 public abstract class AbstractTopDailyProductsStatGlobally implements ProductsStat {
 
     private LocalDate date;
     private int limit;
-    private ProductsJournalsRepository repository;
+    private ProductsSalesRepository repository;
 
-    public AbstractTopDailyProductsStatGlobally(LocalDate date, int limit, ProductsJournalsRepository repository) {
+    public AbstractTopDailyProductsStatGlobally(LocalDate date, int limit, ProductsSalesRepository repository) {
         this.date = date;
         this.limit = limit;
         this.repository = repository;
@@ -28,12 +26,11 @@ public abstract class AbstractTopDailyProductsStatGlobally implements ProductsSt
     public ProductsGroup getStatistics() {
 
         //get all stores' products
-        ProductsJournal journal = repository.getJournal(date);
-        Map<UUID, ProductsGroup> allStoresProducts = journal.getAllProducts();
+        Collection<ProductsGroup> allStoresProducts = repository.getProducts(date);
 
         //merge all stores' products
         ProductsGroup mergedProducts = null;
-        for(ProductsGroup products : allStoresProducts.values()) {
+        for(ProductsGroup products : allStoresProducts) {
             if (mergedProducts == null)
                 mergedProducts = products;
             else

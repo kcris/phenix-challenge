@@ -1,8 +1,6 @@
 package fr.carrefour.phenix.challenge;
 
-import fr.carrefour.phenix.challenge.domain.products.ProductsGroup;
-import fr.carrefour.phenix.challenge.domain.products.ProductsJournal;
-import fr.carrefour.phenix.challenge.domain.products.ProductsJournalsRepository;
+import fr.carrefour.phenix.challenge.domain.products.*;
 import fr.carrefour.phenix.challenge.domain.stats.ProductsStat;
 import fr.carrefour.phenix.challenge.domain.stats.daily.global.TopDailyProductsBySalesValueGlobally;
 import fr.carrefour.phenix.challenge.domain.stats.daily.global.TopDailyProductsBySalesVolumeGlobally;
@@ -57,18 +55,22 @@ class Application
 
 
 		//
-		// A. tasks for computing the input products information
+		// A. tasks for computing the sales information about all our products for any given {day,store}
 		//
 		// use 2 threads - plain, naive impl but is better than single-threaded
 		//
-		final ProductsJournalsRepository repository = new ProductsJournalsRepository();
+		final ProductsSalesRepository repository = new ProductsSalesRepositoryInMemory();
+
+		//final ProductsSalesIO salesIo = new ProductsSalesIOCsv(dataOutputsFolder);
+		//final ProductsSalesRepository repository = new ProductsSalesRepositoryDisk(salesIo);
 
 		Runnable rA1 = () ->
 		{
 			for (int i = 0; i <= 3; ++i) {
 				LocalDate dt = date.minusDays(i);
 				ProductsJournal dailyProducts = journalsLoader.loadProducts(dt); //might throw
-				repository.addJournal(dt, dailyProducts); //all products for all stores (at that date)
+
+				dailyProducts.getAllProducts().forEach((k,v)->repository.addProducts(k, dt, v));
 			}
 		};
 
@@ -77,7 +79,8 @@ class Application
 			for (int i = 4; i <= 6; ++i) {
 				LocalDate dt = date.minusDays(i);
 				ProductsJournal dailyProducts = journalsLoader.loadProducts(dt); //might throw
-				repository.addJournal(dt, dailyProducts); //all products for all stores (at that date)
+
+				dailyProducts.getAllProducts().forEach((k,v)->repository.addProducts(k, dt, v));
 			}
 		};
 		LOGGER.info("Loading journals");
@@ -98,7 +101,7 @@ class Application
 		{
 			{
 				//daily - sales volume
-				for (UUID storeId : repository.getJournal(date).getStores()) {
+				for (UUID storeId : repository.getStores(date)) {
 					ProductsStat stat = new TopDailyProductsBySalesVolumePerStore(storeId, date, topLimit, repository);  //for each store
 					ProductsGroup results = stat.getStatistics();
 					statsSaver.saveProducts(results, CSV("top_100_ventes", storeId, date, ""));
@@ -110,7 +113,7 @@ class Application
 			}
 			{
 				//weekly - sales volume
-				for(UUID storeId : repository.getJournal(date).getStores()) {
+				for(UUID storeId : repository.getStores(date)) {
 					ProductsStat stat = new TopWeeklyProductsBySalesVolumePerStore(storeId, date, topLimit, repository);  //for each store
 					ProductsGroup results = stat.getStatistics();
 					statsSaver.saveProducts(results, CSV("top_100_ventes", "GLOBAL", date, "-J7"));
@@ -126,7 +129,7 @@ class Application
 		{
 			{
 				//daily - sales value
-				for (UUID storeId : repository.getJournal(date).getStores()) {
+				for (UUID storeId : repository.getStores(date)) {
 					ProductsStat stat = new TopDailyProductsBySalesValuePerStore(storeId, date, topLimit, repository);  //for each store
 					ProductsGroup results = stat.getStatistics();
 					statsSaver.saveProducts(results, CSV("top_100_ca", storeId, date, ""));
@@ -138,7 +141,7 @@ class Application
 			}
 			{
 				//weekly - sales value
-				for (UUID storeId : repository.getJournal(date).getStores()) {
+				for (UUID storeId : repository.getStores(date)) {
 					ProductsStat stat = new TopWeeklyProductsBySalesValuePerStore(storeId, date, topLimit, repository); //for each store
 					ProductsGroup results = stat.getStatistics();
 					statsSaver.saveProducts(results, CSV("top_100_ca", storeId, date, "-J7"));

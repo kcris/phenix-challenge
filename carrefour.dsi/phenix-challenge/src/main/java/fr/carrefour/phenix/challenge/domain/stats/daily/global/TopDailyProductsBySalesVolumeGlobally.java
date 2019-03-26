@@ -1,7 +1,7 @@
 package fr.carrefour.phenix.challenge.domain.stats.daily.global;
 
 import fr.carrefour.phenix.challenge.domain.products.Product;
-import fr.carrefour.phenix.challenge.domain.products.ProductsJournalsRepository;
+import fr.carrefour.phenix.challenge.domain.products.ProductsSalesRepository;
 import fr.carrefour.phenix.challenge.domain.products.aggregators.Aggregator;
 import fr.carrefour.phenix.challenge.domain.products.aggregators.ProductAggregatorSumSales;
 import fr.carrefour.phenix.challenge.domain.products.comparators.ProductsComparatorBySoldVolume;
@@ -15,7 +15,7 @@ public class TopDailyProductsBySalesVolumeGlobally extends AbstractTopDailyProdu
 
     private static final Aggregator<Product> AGGREGATOR = new ProductAggregatorSumSales();
 
-    public TopDailyProductsBySalesVolumeGlobally(LocalDate date, int limit, ProductsJournalsRepository repository) {
+    public TopDailyProductsBySalesVolumeGlobally(LocalDate date, int limit, ProductsSalesRepository repository) {
         super(date, limit, repository);
     }
 

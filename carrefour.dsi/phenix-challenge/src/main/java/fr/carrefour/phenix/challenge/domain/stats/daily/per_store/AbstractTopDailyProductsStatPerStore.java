@@ -2,8 +2,7 @@ package fr.carrefour.phenix.challenge.domain.stats.daily.per_store;
 
 import fr.carrefour.phenix.challenge.domain.products.Product;
 import fr.carrefour.phenix.challenge.domain.products.ProductsGroup;
-import fr.carrefour.phenix.challenge.domain.products.ProductsJournal;
-import fr.carrefour.phenix.challenge.domain.products.ProductsJournalsRepository;
+import fr.carrefour.phenix.challenge.domain.products.ProductsSalesRepository;
 import fr.carrefour.phenix.challenge.domain.stats.ProductsStat;
 
 import java.time.LocalDate;
@@ -15,9 +14,9 @@ public abstract class AbstractTopDailyProductsStatPerStore implements ProductsSt
     private UUID storeId;
     private LocalDate date;
     private int limit;
-    private ProductsJournalsRepository repository;
+    private ProductsSalesRepository repository;
 
-    public AbstractTopDailyProductsStatPerStore(UUID storeId, LocalDate date, int limit, ProductsJournalsRepository repository) {
+    public AbstractTopDailyProductsStatPerStore(UUID storeId, LocalDate date, int limit, ProductsSalesRepository repository) {
         this.storeId = storeId;
         this.date = date;
         this.limit = limit;
@@ -28,8 +27,7 @@ public abstract class AbstractTopDailyProductsStatPerStore implements ProductsSt
     public ProductsGroup getStatistics() {
 
         //get store products
-        ProductsJournal journal = repository.getJournal(date);
-        ProductsGroup storeProducts = journal.getStoreProducts(storeId);
+        ProductsGroup storeProducts = repository.getProducts(storeId, date);
 
         //compute top
         ProductsGroup topProducts = storeProducts.top(limit, getComparator());

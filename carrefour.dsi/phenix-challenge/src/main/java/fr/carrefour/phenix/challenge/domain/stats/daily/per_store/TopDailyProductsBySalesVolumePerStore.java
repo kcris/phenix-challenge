@@ -1,7 +1,7 @@
 package fr.carrefour.phenix.challenge.domain.stats.daily.per_store;
 
 import fr.carrefour.phenix.challenge.domain.products.Product;
-import fr.carrefour.phenix.challenge.domain.products.ProductsJournalsRepository;
+import fr.carrefour.phenix.challenge.domain.products.ProductsSalesRepository;
 import fr.carrefour.phenix.challenge.domain.products.comparators.ProductsComparatorBySoldVolume;
 
 import java.time.LocalDate;
@@ -12,7 +12,7 @@ public class TopDailyProductsBySalesVolumePerStore extends AbstractTopDailyProdu
 
     private static final Comparator<Product> COMPARATOR = new ProductsComparatorBySoldVolume();
 
-    public TopDailyProductsBySalesVolumePerStore(UUID storeId, LocalDate date, int limit, ProductsJournalsRepository repository) {
+    public TopDailyProductsBySalesVolumePerStore(UUID storeId, LocalDate date, int limit, ProductsSalesRepository repository) {
         super(storeId, date, limit, repository);
     }
 

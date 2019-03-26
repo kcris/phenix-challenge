@@ -13,6 +13,8 @@ public class ProductsGroupSaverCsv implements ProductsGroupSaver {
 
     private static final Logger LOGGER = LogManager.getLogger(ProductsGroupSaverCsv.class);
 
+    private static final String CSV_SEPARATOR = "|";
+
     private String dataFolder;
 
     public ProductsGroupSaverCsv(String dataFolder) {
@@ -44,7 +46,7 @@ public class ProductsGroupSaverCsv implements ProductsGroupSaver {
 
     private String createCsvLine(Product product) {
 
-        StringJoiner joiner = new StringJoiner(",");
+        StringJoiner joiner = new StringJoiner(CSV_SEPARATOR);
 
         joiner.add(String.valueOf(product.getProductId()));
         joiner.add(String.valueOf(product.getUnitsSold())); //top sales volume
