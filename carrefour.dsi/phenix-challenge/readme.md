@@ -59,7 +59,7 @@ Technical details:
 
 The provided test data set was very small, thus impractical.
 
-A larget test data set was generated with a bash script (gentestdata.sh). This is probably still far from the real-world data volume, but provides better testing. I have generated about 1GB of csv data: 1200 stores, 10.000 products, 15.000 transactions.
+A larger test data set was generated with a bash script (gentestdata.sh). This is probably still far from the real-world data volume, but provides better testing. I have generated about 1GB of csv data: 1200 stores, 10.000 products, 15.000 transactions.
 It took about 10 hours to generate the test data set using the attached bash script.
 
 Results on an average i7, 64 bit machine (using the generated test data):
