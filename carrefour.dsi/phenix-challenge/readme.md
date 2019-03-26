@@ -5,11 +5,11 @@
 
 #### Main idea
 
-For each pair {day, store} we can generate the sales information: a list of all products, for each product we have the tuple {productId, unitsSold, valueSold}. 
+For each pair `{day, store}` we can generate the sales information: a list of all products, for each product we have the tuple `{productId, unitsSold, valueSold}`. 
 
 Note that:
-* unitsSold is relevant for getting the sales volume (ventes) and 
-* valueSold (= unitsSold x dailyPrice) is relevant for the sales value (chiffre affaires)
+* `unitsSold` is relevant for getting the sales volume (ventes) and 
+* `valueSold` (= unitsSold x dailyPrice) is relevant for the sales value (chiffre affaires)
 
 Based on this structure we can easily determine the top sales information like this
 
@@ -30,31 +30,31 @@ Facts:
 #### Architecture
 
 There are two available repository implementations
-* an in-memory repository: loads all sales information for all days/stores in memory. Merging is straight forward. But given the memory constraints, will not be able to handle a large volume of data (in a real-world test). 
-* an on-disk repository: stores all sales information for each pair {day,store} into a separate file. Merging happens by map-reducing multiple files to a single structure. We only load 2 such sales informations at a time in the memory, which allows implementing the memory constraints. (In case this is still not enough, we can further split the sales information into chunks, in a future version).
+* an `in-memory` repository: loads all sales information for all days/stores in memory. Merging is straight forward. But given the memory constraints, will not be able to handle a large volume of data (in a real-world test). 
+* an `on-disk` repository: stores all sales information for each pair {day,store} into a separate file. Merging happens by map-reducing multiple files to a single structure. We only load 2 such sales informations at a time in the memory, which allows implementing the memory constraints. (In case this is still not enough, we can further split the sales information into chunks, in a future version).
 
 Technical details:
-- plain java application, minimal or no dependencies
-	- no external libs except log4j (and that's not important either)
-- large input data
-	- csv is not fully loaded in memory, useless fields are ignored
-	- is 'reduced' while loading to 1 entry per productId
-- comparators used to parameterize the way that *top* is calculated
-	- by sales volume (consider a productInfo's unitsSold)
-	- by sales value (consider a productInfo's valueSold)
-- aggregators supported to parameterize the way that 2 productInfos instances are merged
-	- current aggregation policy: sums the unitsSold and valueSold (for the same productId)
-	- useful to merge multiple productInfo coming from different stores when computing the global top
-	- useful to merge weekly productInfo coming from different days (and different stores) when computing the weekly (global) top
-- main work was split into 2 phases
-	- phase A: create journals for last week (7 days) - this was split into 2 threads
-		- one thread loads journal for 3 days
-		- one thread loads journal for 4 days
-	- phase B: generate the output statistics - this was also split in 2 threads
-		- one thread generates volume stats daily(per store + global) and weekly (per store+global)
-		- one thread generates value stats daily(per store + global) and weekly (per store+global)
-	- phase B depends on phase A, they are serialized
-	- the load for each phase's 2 threads is equally distributed
+* plain java application, minimal or no dependencies
+	* no external libs except log4j (and that's not important either)
+* large input data
+	* csv is not fully loaded in memory, useless fields are ignored
+	* is 'reduced' while loading to 1 entry per productId
+* comparators used to parameterize the way that *top* is calculated
+	* by sales volume (consider a productInfo's unitsSold)
+	* by sales value (consider a productInfo's valueSold)
+* aggregators supported to parameterize the way that 2 productInfos instances are merged
+	* current aggregation policy: sums the unitsSold and valueSold (for the same productId)
+	* useful to merge multiple productInfo coming from different stores when computing the global top
+	* useful to merge weekly productInfo coming from different days (and different stores) when computing the weekly (global) top
+* main work was split into 2 phases, using 2 threads each (allowing for true parallelism, since we have a dual core cpu)
+	* phase A: create journals for last week (7 days) - this was split into 2 threads
+		* one thread loads journal for 3 days
+		* one thread loads journal for 4 days
+	* phase B: generate the output statistics - this was also split in 2 threads
+		* one thread generates volume stats daily(per store + global) and weekly (per store+global)
+		* one thread generates value stats daily(per store + global) and weekly (per store+global)
+	* phase B depends on phase A, they are serialized
+	* the load for each phase's 2 threads is equally distributed
 
 ####  Performance considerations
 
@@ -63,7 +63,7 @@ The provided test data set was very small, thus impractical.
 A larget test data set was generated with a bash script (gentestdata.sh). This is probably still far from the real-world data volume, but provides better testing. I have generated about 1GB of csv data: 1200 stores, 10.000 products, 15.000 transactions.
 It took about 10 hours to generate the test data set using the attached bash script.
 
-Results on an average i7, 64bit machine:
+Results on an average i7, 64bit machine (using the generated test data):
 * the in memory repository: execution time about 20 seconds, 190 MB heap used, 1.7 MB stats generated
 * the on disk repository: TODO
 
