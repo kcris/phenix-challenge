@@ -64,7 +64,7 @@ It took about 10 hours to generate the test data set using the attached bash scr
 
 Results on an average i7, 64 bit machine (using the generated test data):
 * the in memory repository: execution time about 20 seconds, 190 MB heap used, 1.7 MB stats generated
-* the on disk repository: TODO
+* the on disk repository: TODO (almost ready, see the `disk` git branch)
 
 #### TODOs
 
