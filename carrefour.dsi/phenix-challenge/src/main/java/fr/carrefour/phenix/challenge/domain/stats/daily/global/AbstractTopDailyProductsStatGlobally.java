@@ -28,10 +28,15 @@ public abstract class AbstractTopDailyProductsStatGlobally implements ProductsSt
     public ProductsGroup getStatistics() {
 
         //get all stores' products - map-reduce
-        ProductsGroup mergedProducts = new ProductsGroup();
+        ProductsGroup mergedProducts = null;
+
         for (UUID storeId : repository.getStores(date)) {
-            ProductsGroup prod = repository.getProducts(storeId, date);
-            mergedProducts.merge(prod, getAggregator());
+
+            ProductsGroup products = repository.getProducts(storeId, date);
+            if (mergedProducts == null)
+                mergedProducts = products;
+            else
+                mergedProducts = mergedProducts.merge(products, getAggregator());
         }
 
         //compute top

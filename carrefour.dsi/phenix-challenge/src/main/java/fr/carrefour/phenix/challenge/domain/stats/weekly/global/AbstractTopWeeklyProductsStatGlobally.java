@@ -26,14 +26,18 @@ public abstract class AbstractTopWeeklyProductsStatGlobally implements ProductsS
     public ProductsGroup getStatistics() {
 
         //get already computed daily products for the past 7 days and merge them
-        ProductsGroup mergedProducts = new ProductsGroup();
+        ProductsGroup mergedProducts = null;
 
         for (int i = 0; i <= 6; ++i) {
             LocalDate dt = date.minusDays(i);
 
             for (UUID storeId : repository.getStores(dt)) {
-                ProductsGroup prod = repository.getProducts(storeId, dt);
-                mergedProducts.merge(prod, getAggregator());
+
+                ProductsGroup products = repository.getProducts(storeId, dt);
+                if (mergedProducts == null)
+                    mergedProducts = products;
+                else
+                    mergedProducts = mergedProducts.merge(products, getAggregator());
             }
         }
 

@@ -1,110 +1,77 @@
 # Phenix Challenge
 
 
-## Solution 1
+## Solution
 
-#### In memory processing
+#### Main idea
 
-for a given day J we have this structure called (daily) journal
- 	map<storeId, productsGroup>
-
-where productsGroup contains
-	map<productId, productInfo>
-
-where productInfo contains
-	productId, unitsSold, valueSold
-
-We'll group available input data into this structure. 
+For each pair `{day, store}` we can generate the sales information: a list of all products, for each product we have the tuple `{productId, unitsSold, valueSold}`. This is initially loaded for the daily journal info (transactions list + prices information).
 
 Note that:
-* unitsSold - is used to determine the volume of sales for a product (ventes)
-* valueSold - is used to determine the value of sales for a product (chiffre affaires)
+* `unitsSold` is relevant for getting the sales volume (ventes) and 
+* `valueSold` (= unitsSold x dailyPrice) is relevant for the sales value (chiffre affaires)
 
-####  Output statistics
+Based on this structure we can easily determine the top sales information like this:
 
-For a given day J
-- to compute top ventes/ca per store: for a given store, keep top 100 products (based on unitsSold/valueSold)
-- to compute top ventes/ca globally: we *merge* all productsGroup, then keep top 100 products (based on unitsSold/valueSold)
+* top sales volume/value per store per day: just take the top(n) entries from the salesInformation(day, storeId)
+* top sales volume/value globally per day: map/reduce all salesInformation(day, storeIds) and take the top(n) entries
+* top sales volume/value per store per week: map/reduce all salesInformation(days, storeId) and take the top(n) entries
+* top sales volume/value globally per week: map/reduce all salesInformation(days, storeIds) and take the top(n) entries
 
-For a given week J1..J7
-- to compute top ventes/ca per store: for a given store, *merge* the 7-day productsGroup, then keep top 100 (based on unitsSold/valueSold) 
-- to compute top ventes/ca globally: *merge* the 7-day productsGroup of all stores, then keep top 100 (based on unitsSold/valueSold) 
-
-####  Conclusion
-
-The first solution was tested with a large volume data set, about 1GB of csv data: 1200 stores, 10.000 products, 15.000 transactions.
-It took about 10 hours to generate the test data set using the attached bash script.
-Results on an average i7, 64bit machine: execution time about 20 seconds, 190 MB heap used, 1.7 MB stats generated.
+The two important operations here applied on sales information are:
+* merge or map/reduce multiple sales informations into a single structure (allows low memory footprint)
+* compute the top(n) entries in a sales information
 
 Facts:
 * we have strict memory requirements
 * we have a large number of available stores/products
-* we must output some aggregated statistics which must take into account product information for multiple stores (global stats), multiple days (weekly stats), or both multi-store-multi-day (global weekly stats)
+* we must output some aggregated statistics which must take into account product information for multiple stores (global stats), multiple days (weekly stats), or both multi-store-multi-day (global weekly stats).
 
-Because of all this, a simple/naive in-memory solution is probably not functional under the real amount of data which can be a lot bigger.
-Since we have no full test data for a real store, it's hard to do a real-world test other than based on estimations.
-However, the next solution attempts to fix all this by reducing memory consumption.
+#### Architecture
 
-## Solution 2
+There are two available repository implementations
+* an `in-memory` repository: loads all sales information for all days/stores in memory. Merging is straight forward. But given the memory constraints, will not be able to handle a large volume of data (in a real-world test). 
+* an `on-disk` repository: stores all sales information for each pair `{day,store}` into a separate file. Merging happens by map-reducing multiple files to a single structure. We only load 2 such sales informations at a time in the memory, which allows implementing the memory constraints. (In case this is still not enough, we can further split the sales information into chunks, in a future version).
 
-#### map-reduce solution using temporary files
+Technical details:
+* plain java application, minimal or no dependencies
+	* no external libs except log4j (and that's not important either)
+* large input data
+	* csv is not fully loaded in memory, useless fields are ignored
+	* we only load 2 sales informations in memory at a time
+* comparators used to parameterize the way that *top* is calculated
+	* by sales volume (consider a productInfo's unitsSold)
+	* by sales value (consider a productInfo's valueSold)
+* aggregators supported to parameterize the way that 2 sales information instances are merged
+	* current aggregation policy: sums the unitsSold and valueSold (for the same productId)
+	* aggregation allows to get global or weekly statistics
+* main work was split into 2 phases, using 2 threads each (allowing for true parallelism, since we have a dual core cpu)
+	* phase A: load journals for last week (7 days) and create sales information - this was split into 2 threads
+		* one thread loads journal for 3 days
+		* one thread loads journal for 4 days
+	* phase B: generate the output statistics - this was also split in 2 threads
+		* one thread generates volume stats daily(per store + global) and weekly (per store+global)
+		* one thread generates value stats daily(per store + global) and weekly (per store+global)
+	* phase B depends on phase A, they are serialized
+	* the load for each phase's 2 threads is equally distributed
 
-Under the following assumptions
-* we can load the journal for one day in memory
-* we can load the per-product sales information (units sold, value sold) for any store/day into memory
-* this matches our memory constraints
+####  Performance considerations
 
-we can develop a mapped reduce solution which uses intermediary files like this
-* for each {store, day} create a file which contains sales info (units sold, value sold) for all products
-* we can then reduce multiple such files when aggregating statistics
-	* determine a set of sales info to be merged/aggregated
-	* scan/process 2 such files at a time, for each productid pId 
-		* read sales info in both files
-		* build a new (reduced) sales info like this: unitsSold=max(sales1.unitsSold, sales2.unitsSold), valueSold=the max(sales1.valueSold, sales2.valueSold) 
-		* store the new sales info (based on merging/reducing the 2 input files) into a new file
-	* repeat process until all set of sales files to be merged are reduced to one file = the final/aggregated sales info for our products
-	* get the top records in our aggregated sales info (either by sales volume or sales value criteria)
+The provided test data set was very small, thus impractical.
 
-note: in case we want to reduce the memory consumption even more, we can do further splitting of {store,day} sales information into smaller files having a fixed size chunk limit (a specified number of product records)
+A larger test data set was generated with a bash script (gentestdata.sh). This is probably still far from the real-world data volume (it's not clear for example how many distinct product types exist across all stores). However, the generated data provides a better testbed. I have generated about 1GB of csv data: 1200 stores, 10.000 products, 15.000 transactions (it took about 10 hours to generate this test data set using the attached bash script).
 
-#### TODO - this is work in progress
+Results on an average i7, 64 bit machine (using the generated test data):
+* the in memory repository: execution time about 20 seconds, 190 MB heap used, 1.7 MB stats generated
+* the on disk repository: TODO - add results here (use this solution via the `disk` git branch)
 
-## Technical details
+#### TODOs
 
-- plain java application, minimal or no dependencies
-	- no external libs except log4j (and that's not important either)
-- large input data
-	- csv is not fully loaded in memory, useless fields are ignored
-	- is 'reduced' while loading to 1 entry per productId
-- comparators used to parameterize the way that *top* is calculated
-	- by sales volume (consider a productInfo's unitsSold)
-	- by sales value (consider a productInfo's valueSold)
-- aggregators supported to parameterize the way that 2 productInfos instances are merged
-	- current aggregation policy: sums the unitsSold and valueSold (for the same productId)
-	- useful to merge multiple productInfo coming from different stores when computing the global top
-	- useful to merge weekly productInfo coming from different days (and different stores) when computing the weekly (global) top
-- main work was split into 2 phases
-	- phase A: create journals for last week (7 days) - this was split into 2 threads
-		- one thread loads journal for 3 days
-		- one thread loads journal for 4 days
-	- phase B: generate the output statistics - this was also split in 2 threads
-		- one thread generates volume stats daily(per store + global) and weekly (per store+global)
-		- one thread generates value stats daily(per store + global) and weekly (per store+global)
-	- phase B depends on phase A, they are serialized
-	- the load for each phase's 2 threads is equally distributed
-
-## TODOs
-
-- tests
-	- more unit tests
-	- full-scale test data set
-- optimize
-	- intermediary files for smaller batch processing?
-	- reuse oututs generated by previous runs?
-- improve
-	- configuration support (args or conf file)
-	- more docs
-
+* tests: more coverage; full-scale test data set??
+* optimize: reuse outputs generated by previous runs?
+* add configuration support (args or conf file)
+* handle invalid/missing data/files
+* add more docs
 
 ## Running the application
 

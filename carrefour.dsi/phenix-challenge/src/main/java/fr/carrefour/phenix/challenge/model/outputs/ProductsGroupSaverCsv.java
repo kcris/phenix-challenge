@@ -22,7 +22,7 @@ public class ProductsGroupSaverCsv implements ProductsGroupSaver {
     }
 
     @Override
-    public void saveProducts(ProductsGroup products, String title) {
+    public void saveProducts(ProductsGroup products, String title, ProductsGroupSortFilter sortFilter) {
 
         String csvPath = String.format("./%s/%s.csv", dataFolder, title);
         LOGGER.debug("Saving statistics to " + csvPath);
@@ -33,7 +33,8 @@ public class ProductsGroupSaverCsv implements ProductsGroupSaver {
 
             try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
                 products.getProducts().values().stream()
-                        .map(this::createCsvLine)
+                        .sorted(sortFilter.getSoldFieldComparator().reversed()) //sort in descending order
+                        .map(p -> createCsvLine(p, sortFilter))
                         .forEach(pw::println);
             }
 
@@ -44,13 +45,12 @@ public class ProductsGroupSaverCsv implements ProductsGroupSaver {
         }
     }
 
-    private String createCsvLine(Product product) {
+    private String createCsvLine(Product product, ProductsGroupSortFilter sortFilter) {
 
         StringJoiner joiner = new StringJoiner(CSV_SEPARATOR);
 
         joiner.add(String.valueOf(product.getProductId()));
-        joiner.add(String.valueOf(product.getUnitsSold())); //top sales volume
-        joiner.add(String.valueOf(product.getValueSold())); //top sales value
+        joiner.add(sortFilter.getSoldFieldValue(product));
 
         return joiner.toString();
     }

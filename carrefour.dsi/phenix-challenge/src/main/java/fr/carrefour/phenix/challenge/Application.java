@@ -12,10 +12,7 @@ import fr.carrefour.phenix.challenge.domain.stats.weekly.per_store.TopWeeklyProd
 import fr.carrefour.phenix.challenge.domain.stats.weekly.per_store.TopWeeklyProductsBySalesVolumePerStore;
 import fr.carrefour.phenix.challenge.model.inputs.ProductsJournalBuilder;
 import fr.carrefour.phenix.challenge.model.inputs.ProductsJournalBuilderCsv;
-import fr.carrefour.phenix.challenge.model.outputs.ProductsGroupSaver;
-import fr.carrefour.phenix.challenge.model.outputs.ProductsGroupSaverCsv;
-import fr.carrefour.phenix.challenge.model.outputs.ProductsSalesIO;
-import fr.carrefour.phenix.challenge.model.outputs.ProductsSalesIOCsv;
+import fr.carrefour.phenix.challenge.model.outputs.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,20 +46,24 @@ class Application
 		final LocalDate date = LocalDate.of(2017, 05, 14);
 		final String dataInputsFolder = "phenix-challenge/data/input";
 		final String dataOutputsFolder = "phenix-challenge/data/output";
-		final int topLimit = 100;
+		final int topLimit = 3;
 
 		//dependencies 'injection'
 		final ProductsJournalBuilder journalsLoader = new ProductsJournalBuilderCsv(dataInputsFolder);
 		final ProductsGroupSaver statsSaver = new ProductsGroupSaverCsv(dataOutputsFolder);
-
+		final ProductsGroupSortFilter sortFilterVolumeSold = new ProductsGroupSortFilterVolumeSold();
+		final ProductsGroupSortFilter sortFilterValueSold = new ProductsGroupSortFilterValueSold();
 
 		//
 		// A. tasks for computing the sales information about all our products for any given {day,store}
 		//
 		// use 2 threads - plain, naive impl but is better than single-threaded
 		//
+
+		//in-memory repository
 		//final ProductsSalesRepository repository = new ProductsSalesRepositoryInMemory();
 
+		//on-disk repository
 		final ProductsSalesIO salesIo = new ProductsSalesIOCsv(dataOutputsFolder);
 		final ProductsSalesRepository repository = new ProductsSalesRepositoryDisk(salesIo);
 
@@ -106,24 +107,24 @@ class Application
 				for (UUID storeId : repository.getStores(date)) {
 					ProductsStat stat = new TopDailyProductsBySalesVolumePerStore(storeId, date, topLimit, repository);  //for each store
 					ProductsGroup results = stat.getStatistics();
-					statsSaver.saveProducts(results, CSV("top_100_ventes", storeId, date, ""));
+					statsSaver.saveProducts(results, CSV("top_100_ventes", storeId, date, ""), sortFilterVolumeSold);
 				}
 
 				ProductsStat stat = new TopDailyProductsBySalesVolumeGlobally(date, topLimit, repository);
 				ProductsGroup results = stat.getStatistics();
-				statsSaver.saveProducts(results, CSV("top_100_ventes", "GLOBAL", date, ""));
+				statsSaver.saveProducts(results, CSV("top_100_ventes", "GLOBAL", date, ""), sortFilterVolumeSold);
 			}
 			{
 				//weekly - sales volume
 				for(UUID storeId : repository.getStores(date)) {
 					ProductsStat stat = new TopWeeklyProductsBySalesVolumePerStore(storeId, date, topLimit, repository);  //for each store
 					ProductsGroup results = stat.getStatistics();
-					statsSaver.saveProducts(results, CSV("top_100_ventes", storeId, date, "-J7"));
+					statsSaver.saveProducts(results, CSV("top_100_ventes", storeId, date, "-J7"), sortFilterVolumeSold);
 				}
 
 				ProductsStat stat = new TopWeeklyProductsBySalesVolumeGlobally(date, topLimit, repository);
 				ProductsGroup results = stat.getStatistics();
-				statsSaver.saveProducts(results, CSV("top_100_ventes", "GLOBAL", date,"-J7"));
+				statsSaver.saveProducts(results, CSV("top_100_ventes", "GLOBAL", date,"-J7"), sortFilterVolumeSold);
 			}
 		};
 
@@ -134,23 +135,23 @@ class Application
 				for (UUID storeId : repository.getStores(date)) {
 					ProductsStat stat = new TopDailyProductsBySalesValuePerStore(storeId, date, topLimit, repository);  //for each store
 					ProductsGroup results = stat.getStatistics();
-					statsSaver.saveProducts(results, CSV("top_100_ca", storeId, date, ""));
+					statsSaver.saveProducts(results, CSV("top_100_ca", storeId, date, ""), sortFilterValueSold);
 				}
 
 				ProductsStat stat = new TopDailyProductsBySalesValueGlobally(date, topLimit, repository);
 				ProductsGroup results = stat.getStatistics();
-				statsSaver.saveProducts(results, CSV("top_100_ca", "GLOBAL", date, ""));
+				statsSaver.saveProducts(results, CSV("top_100_ca", "GLOBAL", date, ""), sortFilterValueSold);
 			}
 			{
 				//weekly - sales value
 				for (UUID storeId : repository.getStores(date)) {
 					ProductsStat stat = new TopWeeklyProductsBySalesValuePerStore(storeId, date, topLimit, repository); //for each store
 					ProductsGroup results = stat.getStatistics();
-					statsSaver.saveProducts(results, CSV("top_100_ca", storeId, date, "-J7"));
+					statsSaver.saveProducts(results, CSV("top_100_ca", storeId, date, "-J7"), sortFilterValueSold);
 				}
 				ProductsStat stat = new TopWeeklyProductsBySalesValueGlobally(date, topLimit, repository);
 				ProductsGroup results = stat.getStatistics();
-				statsSaver.saveProducts(results, CSV("top_100_ca", "GLOBAL", date, "-J7"));
+				statsSaver.saveProducts(results, CSV("top_100_ca", "GLOBAL", date, "-J7"), sortFilterValueSold);
 			}
 		};
 		LOGGER.info("Creating statistics");

@@ -11,6 +11,8 @@
     </parent>
 
     <artifactId>phenix-challenge</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
+
     <name>Phenix Challenge</name>
     <packaging>jar</packaging>
 

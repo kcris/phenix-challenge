@@ -3,5 +3,5 @@ package fr.carrefour.phenix.challenge.model.outputs;
 import fr.carrefour.phenix.challenge.domain.products.ProductsGroup;
 
 public interface ProductsGroupSaver {
-    void saveProducts(ProductsGroup products, String title);
+    void saveProducts(ProductsGroup products, String title, ProductsGroupSortFilter sortFilter);
 }

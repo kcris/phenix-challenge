@@ -27,10 +27,10 @@ public abstract class AbstractTopDailyProductsStatPerStore implements ProductsSt
     public ProductsGroup getStatistics() {
 
         //get store products
-        ProductsGroup storeProducts = repository.getProducts(storeId, date);
+        ProductsGroup products = repository.getProducts(storeId, date);
 
         //compute top
-        ProductsGroup topProducts = storeProducts.top(limit, getComparator());
+        ProductsGroup topProducts = products.top(limit, getComparator());
         return topProducts;
     }
 
