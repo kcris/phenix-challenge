@@ -5,21 +5,21 @@
 
 #### Main idea
 
-For each pair `{day, store}` we can generate the sales information: a list of all products, for each product we have the tuple `{productId, unitsSold, valueSold}`. 
+For each pair `{day, store}` we can generate the sales information: a list of all products, for each product we have the tuple `{productId, unitsSold, valueSold}`. This is initially loaded for the daily journal info (transactions list + prices information).
 
 Note that:
 * `unitsSold` is relevant for getting the sales volume (ventes) and 
 * `valueSold` (= unitsSold x dailyPrice) is relevant for the sales value (chiffre affaires)
 
-Based on this structure we can easily determine the top sales information like this
+Based on this structure we can easily determine the top sales information like this:
 
-* top sales volume/value per store per day: just take the top(n) entries from the salesInformation(day, store)
-* top sales volume/value globally per day: map/reduce all salesInformation(day, all storeIds) and take the top(n) entries
+* top sales volume/value per store per day: just take the top(n) entries from the salesInformation(day, storeId)
+* top sales volume/value globally per day: map/reduce all salesInformation(day, storeIds) and take the top(n) entries
 * top sales volume/value per store per week: map/reduce all salesInformation(days, storeId) and take the top(n) entries
 * top sales volume/value globally per week: map/reduce all salesInformation(days, storeIds) and take the top(n) entries
 
 The two important operations here applied on sales information are:
-* merge or map/reduce multiple sales informations into a single structure
+* merge or map/reduce multiple sales informations into a single structure (allows low memory footprint)
 * compute the top(n) entries in a sales information
 
 Facts:
