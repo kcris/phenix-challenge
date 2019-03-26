@@ -34,13 +34,4 @@ public class ProductsSalesRepositoryDisk implements ProductsSalesRepository {
     public Collection<UUID> getStores(LocalDate date) {
         return salesIo.findStores(date);
     }
-
-    @Override
-    public Collection<ProductsGroup> getProducts(LocalDate date) {
-        Collection<ProductsGroup> products = new ArrayList<>();
-        for (UUID storeId : getStores(date)) {
-            products.add(getProducts(storeId, date));
-        }
-        return products;
-    }
 }

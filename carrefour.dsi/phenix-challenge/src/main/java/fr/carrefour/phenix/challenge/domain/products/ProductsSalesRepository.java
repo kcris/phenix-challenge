@@ -17,5 +17,4 @@ public interface ProductsSalesRepository {
     void addProducts(UUID storeId, LocalDate date, ProductsGroup products);
     ProductsGroup getProducts(UUID storeId, LocalDate date);
     Collection<UUID> getStores(LocalDate date);
-    Collection<ProductsGroup> getProducts(LocalDate date);
 }

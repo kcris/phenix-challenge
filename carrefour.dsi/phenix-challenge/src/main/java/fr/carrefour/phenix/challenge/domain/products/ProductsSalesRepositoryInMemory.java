@@ -33,8 +33,4 @@ public class ProductsSalesRepositoryInMemory implements ProductsSalesRepository 
         return dailyJournals.get(date).getStores();
     }
 
-    @Override
-    public Collection<ProductsGroup> getProducts(LocalDate date) {
-        return dailyJournals.get(date).getAllProducts().values();
-    }
 }

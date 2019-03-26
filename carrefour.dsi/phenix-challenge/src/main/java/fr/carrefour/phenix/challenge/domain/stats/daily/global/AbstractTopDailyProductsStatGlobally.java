@@ -7,8 +7,10 @@ import fr.carrefour.phenix.challenge.domain.products.aggregators.Aggregator;
 import fr.carrefour.phenix.challenge.domain.stats.ProductsStat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.UUID;
 
 public abstract class AbstractTopDailyProductsStatGlobally implements ProductsStat {
 
@@ -25,16 +27,11 @@ public abstract class AbstractTopDailyProductsStatGlobally implements ProductsSt
     @Override
     public ProductsGroup getStatistics() {
 
-        //get all stores' products
-        Collection<ProductsGroup> allStoresProducts = repository.getProducts(date);
-
-        //merge all stores' products
-        ProductsGroup mergedProducts = null;
-        for(ProductsGroup products : allStoresProducts) {
-            if (mergedProducts == null)
-                mergedProducts = products;
-            else
-                mergedProducts = mergedProducts.merge(products, getAggregator());
+        //get all stores' products - map-reduce
+        ProductsGroup mergedProducts = new ProductsGroup();
+        for (UUID storeId : repository.getStores(date)) {
+            ProductsGroup prod = repository.getProducts(storeId, date);
+            mergedProducts.merge(prod, getAggregator());
         }
 
         //compute top

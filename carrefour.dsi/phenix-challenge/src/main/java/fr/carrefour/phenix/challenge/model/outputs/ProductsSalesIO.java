@@ -1,7 +1,6 @@
 package fr.carrefour.phenix.challenge.model.outputs;
 
 import fr.carrefour.phenix.challenge.domain.products.ProductsGroup;
-import fr.carrefour.phenix.challenge.domain.products.ProductsJournal;
 
 import java.time.LocalDate;
 import java.util.Collection;

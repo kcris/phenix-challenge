@@ -8,6 +8,7 @@ import fr.carrefour.phenix.challenge.domain.stats.ProductsStat;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.UUID;
 
 public abstract class AbstractTopWeeklyProductsStatGlobally implements ProductsStat {
 
@@ -25,16 +26,14 @@ public abstract class AbstractTopWeeklyProductsStatGlobally implements ProductsS
     public ProductsGroup getStatistics() {
 
         //get already computed daily products for the past 7 days and merge them
-        ProductsGroup mergedProducts = null;
+        ProductsGroup mergedProducts = new ProductsGroup();
 
         for (int i = 0; i <= 6; ++i) {
             LocalDate dt = date.minusDays(i);
 
-            for (ProductsGroup products : repository.getProducts(dt)) {
-                if (mergedProducts == null)
-                    mergedProducts = products;
-                else
-                    mergedProducts = mergedProducts.merge(products, getAggregator());
+            for (UUID storeId : repository.getStores(dt)) {
+                ProductsGroup prod = repository.getProducts(storeId, dt);
+                mergedProducts.merge(prod, getAggregator());
             }
         }
 

@@ -14,6 +14,8 @@ import fr.carrefour.phenix.challenge.model.inputs.ProductsJournalBuilder;
 import fr.carrefour.phenix.challenge.model.inputs.ProductsJournalBuilderCsv;
 import fr.carrefour.phenix.challenge.model.outputs.ProductsGroupSaver;
 import fr.carrefour.phenix.challenge.model.outputs.ProductsGroupSaverCsv;
+import fr.carrefour.phenix.challenge.model.outputs.ProductsSalesIO;
+import fr.carrefour.phenix.challenge.model.outputs.ProductsSalesIOCsv;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -59,10 +61,10 @@ class Application
 		//
 		// use 2 threads - plain, naive impl but is better than single-threaded
 		//
-		final ProductsSalesRepository repository = new ProductsSalesRepositoryInMemory();
+		//final ProductsSalesRepository repository = new ProductsSalesRepositoryInMemory();
 
-		//final ProductsSalesIO salesIo = new ProductsSalesIOCsv(dataOutputsFolder);
-		//final ProductsSalesRepository repository = new ProductsSalesRepositoryDisk(salesIo);
+		final ProductsSalesIO salesIo = new ProductsSalesIOCsv(dataOutputsFolder);
+		final ProductsSalesRepository repository = new ProductsSalesRepositoryDisk(salesIo);
 
 		Runnable rA1 = () ->
 		{
@@ -116,7 +118,7 @@ class Application
 				for(UUID storeId : repository.getStores(date)) {
 					ProductsStat stat = new TopWeeklyProductsBySalesVolumePerStore(storeId, date, topLimit, repository);  //for each store
 					ProductsGroup results = stat.getStatistics();
-					statsSaver.saveProducts(results, CSV("top_100_ventes", "GLOBAL", date, "-J7"));
+					statsSaver.saveProducts(results, CSV("top_100_ventes", storeId, date, "-J7"));
 				}
 
 				ProductsStat stat = new TopWeeklyProductsBySalesVolumeGlobally(date, topLimit, repository);
