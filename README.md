@@ -1,3 +1,12 @@
+Solution
+---------
+see [carrefour.dsi/phenix-challenge/readme.md]
+
+
+
+
+
+
 Le but de cet exercice est de déterminer la capacité du candidat à implémenter une réponse complète à un besoin concret, avec une solution efficace respectant les contraintes, et un code de qualité. 
 
 
