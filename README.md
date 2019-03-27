@@ -1,6 +1,6 @@
 Solution
 ---------
-see [carrefour.dsi/phenix-challenge/readme.md]
+see [carrefour.dsi/phenix-challenge/readme.md](here)
 
 
 
