@@ -31,7 +31,7 @@ Facts:
 
 There are two available repository implementations
 * an `in-memory` repository: loads all sales information for all days/stores in memory. Merging is straight forward. But given the memory constraints, will not be able to handle a large volume of data (in a real-world test). 
-* an `on-disk` repository: stores all sales information for each pair `{day,store}` into a separate file. Merging happens by map-reducing multiple files to a single structure. We only load 2 such sales informations at a time in the memory, which allows implementing the memory constraints. (In case this is still not enough, we can further split the sales information into chunks, in a future version).
+* an `on-disk` repository: stores all sales information for each pair `{day,store}` into a separate file. Merging happens by map-reducing multiple files to a single structure. We only load 2 such sales informations at a time in the memory, which allows implementing the memory constraints. (In case this is still not enough, we can maybe further split the sales information into chunks?).
 
 Technical details:
 * plain java application, minimal or no dependencies
@@ -59,7 +59,7 @@ Technical details:
 
 The provided test data set was very small, thus impractical.
 
-A larger test data set was generated with a bash script (gentestdata.sh). This is probably still far from the real-world data volume (it's not clear for example how many distinct product types exist across all stores). However, the generated data provides a better testbed. I have generated about 1GB of csv data: 1200 stores, 10.000 products, 15.000 transactions (it took about 10 hours to generate this test data set using the attached bash script).
+A larger test data set was generated with a bash script (gentestdata.sh). This is probably still far from the real-world data volume (it's not clear for example how many distinct product types exist across all stores). However, the generated data provides a better testbed. I have generated about 1GB of csv data: 1200 stores, 10.000 products, 15.000 transactions (it took about 10 hours to generate this test data set using the attached bash script). Test data temporarily available online [here](https://we.tl/t-BhyP4aTxSX) - about 140 MB, compressed via 7z.
 
 Results on an average i7, 64 bit machine (using the generated test data):
 * the in memory repository: execution time about 20 seconds, 190 MB heap used, 1.7 MB stats generated
